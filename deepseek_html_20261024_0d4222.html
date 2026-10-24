@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ciclo de Estudos — 5 Ciclos</title>
+<style>
+  :root {
+    --lilac-50:  #f5f3ff;
+    --lilac-100: #ede9fe;
+    --lilac-200: #ddd6fe;
+    --lilac-300: #c4b5fd;
+    --lilac-400: #a78bfa;
+    --lilac-500: #8b5cf6;
+    --lilac-600: #7c3aed;
+    --lilac-700: #6d28d9;
+    --text-dark: #1e1b4b;
+    --text-muted: #6b7280;
+    --border: #ddd6fe;
+    --bg-soft: #faf5ff;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    --danger-border: #fecaca;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    padding: 20px;
+    color: var(--text-dark);
+  }
+
+  .widget {
+    width: 100%;
+    max-width: 460px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 28px;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+
+  .header h1 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--lilac-700);
+  }
+
+  .cycle-badge {
+    background: var(--lilac-100);
+    color: var(--lilac-700);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid var(--lilac-200);
+    white-space: nowrap;
+  }
+
+  .cycle-selector { display: flex; gap: 6px; margin-bottom: 18px; }
+
+  .cycle-pill {
+    flex: 1;
+    padding: 8px 4px;
+    border-radius: 10px;
+    background: var(--lilac-50);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  .cycle-pill:hover { border-color: var(--lilac-400); color: var(--lilac-600); }
+  .cycle-pill.done  { border-color: var(--lilac-300); color: var(--lilac-600); background: var(--lilac-100); }
+
+  .cycle-pill.active {
+    background: var(--lilac-500);
+    color: #fff;
+    border-color: var(--lilac-500);
+  }
+
+  .cycle-pill.active.done {
+    background: var(--lilac-600);
+    border-color: var(--lilac-600);
+  }
+
+  .subjects { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+
+  .subject {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    transition: background 0.25s, border-color 0.25s, opacity 0.25s;
+    cursor: pointer;
+  }
+
+  .subject:hover { border-color: var(--lilac-400); }
+
+  .subject.active {
+    background: var(--lilac-100);
+    border-color: var(--lilac-500);
+  }
+
+  .subject.done { opacity: 0.55; }
+  .subject.done .name { text-decoration: line-through; }
+
+  .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .s1 .dot { background: var(--lilac-400); }
+  .s2 .dot { background: var(--lilac-500); }
+  .s3 .dot { background: var(--lilac-600); }
+
+  .subject .info { flex: 1; }
+  .subject .name { font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
+  .subject .time { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+
+  .check {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--lilac-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: transparent;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
+    cursor: pointer;
+    flex-shrink: 0;
+    background: #ffffff;
+  }
+
+  .check:hover { border-color: var(--lilac-600); transform: scale(1.1); }
+  .subject.done .check { background: var(--lilac-500); border-color: var(--lilac-500); color: #ffffff; }
+
+  .timer-box {
+    text-align: center;
+    padding: 22px;
+    background: var(--lilac-50);
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+
+  .timer-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+  }
+
+  .timer {
+    font-size: 3rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+    color: var(--lilac-600);
+  }
+
+  .timer.warning { animation: pulse 1s infinite; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.35; }
+  }
+
+  .controls { display: flex; gap: 10px; }
+
+  button {
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.1s;
+  }
+
+  button:active { transform: scale(0.98); }
+
+  .controls button { flex: 1; }
+
+  .btn-primary {
+    background: var(--lilac-500);
+    color: #ffffff;
+  }
+
+  .btn-primary:hover { background: var(--lilac-600); }
+
+  .btn-secondary {
+    background: #ffffff;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover { background: var(--lilac-50); color: var(--lilac-700); border-color: var(--lilac-300); }
+
+  .btn-secondary.confirming {
+    background: var(--danger-bg);
+    border-color: var(--danger-border);
+    color: var(--danger);
+  }
+
+  .btn-complete {
+    width: 100%;
+    margin-top: 10px;
+    padding: 13px;
+    border: 2px solid var(--lilac-500);
+    background: #ffffff;
+    color: var(--lilac-600);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .btn-complete:hover:not(:disabled) {
+    background: var(--lilac-100);
+  }
+
+  .btn-complete:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    background: var(--lilac-50);
+    border-color: var(--lilac-200);
+    color: var(--lilac-300);
+    transform: none;
+  }
+
+  .progress-bar {
+    height: 6px;
+    background: var(--lilac-100);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 20px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--lilac-500);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+
+  .footer-info {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 12px;
+  }
+
+  .reset-all {
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--lilac-300);
+    margin-top: 14px;
+    cursor: pointer;
+    transition: color 0.2s;
+    user-select: none;
+    padding: 4px;
+  }
+
+  .reset-all:hover { color: var(--lilac-500); }
+
+  .reset-all.confirming {
+    color: var(--danger);
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="header">
+    <h1>Ciclo de Estudos</h1>
+    <div class="cycle-badge" id="cycleBadge">Ciclo 1 / 5</div>
+  </div>
+
+  <div class="cycle-selector" id="cycleSelector"></div>
+
+  <div class="subjects" id="subjectsList"></div>
+
+  <div class="timer-box">
+    <div class="timer-label" id="timerLabel">Matéria atual</div>
+    <div class="timer" id="timer">00:00</div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-primary" id="startBtn">▶ Iniciar</button>
+    <button class="btn-secondary" id="resetBtn">↻ Reiniciar ciclo</button>
+  </div>
+
+  <button class="btn-complete" id="completeBtn">✓ Marcar como concluída</button>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <div class="footer-info" id="footerInfo">0 de 3 matérias do Ciclo 1</div>
+  <div class="reset-all" id="resetAll">🗑 Limpar todo o progresso</div>
+</div>
+
+<script>
+/* =========================================================
+   CONFIGURAÇÃO — 5 CICLOS
+   ========================================================= */
+const CONFIG = {
+  cycles: [
+    { name: 'Ciclo 1', subjects: [
+      { name: 'Direito Constitucional', time: 120 },
+      { name: 'Reconhecimento e fala',  time: 120 },
+      { name: 'Inglês',                 time: 90  }
+    ]},
+    { name: 'Ciclo 2', subjects: [
+      { name: 'Direito Administrativo',   time: 120 },
+      { name: 'Tecnologia da Informação', time: 120 },
+      { name: 'Ciência Política',         time: 90  }
+    ]},
+    { name: 'Ciclo 3', subjects: [
+      { name: 'Linguística',           time: 120 },
+      { name: 'Administração Pública', time: 90  },
+      { name: 'Processo Legislativo',  time: 120 }
+    ]},
+    { name: 'Ciclo 4', subjects: [
+      { name: 'Regimento da Câmara', time: 120 },
+      { name: 'Redação',             time: 90  },
+      { name: 'Português',           time: 120 }
+    ]},
+    { name: 'Ciclo 5', subjects: [
+      { name: 'Revisão',                    time: null },
+      { name: 'Planejamento próximo ciclo', time: null }
+    ]}
+  ]
+};
+
+/* =========================================================
+   STORAGE
+   ========================================================= */
+const STORAGE_KEY = 'ciclo-estudos-v1';
+
+/* =========================================================
+   ESTADO
+   ========================================================= */
+let activeCycle = 0;
+let completed = [];
+let current = 0;
+let secondsLeft = 0;
+let isCountdown = true;
+let running = false;
+let interval = null;
+let tickCount = 0;
+
+/* =========================================================
+   ELEMENTOS
+   ========================================================= */
+const listEl      = document.getElementById('subjectsList');
+const selectorEl  = document.getElementById('cycleSelector');
+const timerEl     = document.getElementById('timer');
+const labelEl     = document.getElementById('timerLabel');
+const startBtn    = document.getElementById('startBtn');
+const resetBtn    = document.getElementById('resetBtn');
+const completeBtn = document.getElementById('completeBtn');
+const progress    = document.getElementById('progressFill');
+const cycleBadge  = document.getElementById('cycleBadge');
+const footerInfo  = document.getElementById('footerInfo');
+const resetAllEl  = document.getElementById('resetAll');
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+const currentSubjects = () => CONFIG.cycles[activeCycle].subjects;
+
+function formatTime(sec) {
+  const s = Math.max(0, Math.floor(sec));
+  const m = String(Math.floor(s / 60)).padStart(2, '0');
+  const ss = String(s % 60).padStart(2, '0');
+  return `${m}:${ss}`;
+}
+
+function formatSubjectTime(min) {
+  if (min === null || min === undefined) return 'Tempo livre';
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  if (h === 0) return `${m} min`;
+  if (m === 0) return `${h}h`;
+  return `${h}h${String(m).padStart(2, '0')}`;
+}
+
+/* =========================================================
+   PERSISTÊNCIA
+   ========================================================= */
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      activeCycle, completed, current, secondsLeft, savedAt: Date.now()
+    }));
+  } catch (e) { console.warn('Não foi possível salvar:', e); }
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    if (!Array.isArray(s.completed) || s.completed.length !== CONFIG.cycles.length) return false;
+    for (let i = 0; i < CONFIG.cycles.length; i++) {
+      if (!Array.isArray(s.completed[i]) ||
+          s.completed[i].length !== CONFIG.cycles[i].subjects.length) return false;
+    }
+    activeCycle = Math.min(Math.max(0, s.activeCycle ?? 0), CONFIG.cycles.length - 1);
+    completed = s.completed;
+    current = Math.min(Math.max(0, s.current ?? 0), currentSubjects().length - 1);
+    if (typeof s.secondsLeft === 'number' && s.secondsLeft >= 0) secondsLeft = s.secondsLeft;
+    return true;
+  } catch { return false; }
+}
+
+/* =========================================================
+   CONFIRMAÇÃO EM DOIS CLIQUES
+   ========================================================= */
+let resetPending = false;
+let resetTimeout = null;
+let resetAllPending = false;
+let resetAllTimeout = null;
+
+function cancelResetPending() {
+  if (resetPending) {
+    clearTimeout(resetTimeout);
+    resetPending = false;
+    resetBtn.classList.remove('confirming');
+    resetBtn.textContent = `↻ Reiniciar Ciclo ${activeCycle + 1}`;
+  }
+}
+
+function cancelResetAllPending() {
+  if (resetAllPending) {
+    clearTimeout(resetAllTimeout);
+    resetAllPending = false;
+    resetAllEl.classList.remove('confirming');
+    resetAllEl.textContent = '🗑 Limpar todo o progresso';
+  }
+}
+
+function cancelAllPending() {
+  cancelResetPending();
+  cancelResetAllPending();
+}
+
+/* =========================================================
+   RENDER — CICLOS
+   ========================================================= */
+function renderCycleSelector() {
+  selectorEl.innerHTML = CONFIG.cycles.map((c, i) => {
+    const done = completed[i].every(Boolean);
+    const cls = ['cycle-pill'];
+    if (i === activeCycle) cls.push('active');
+    if (done) cls.push('done');
+    return `<div class="${cls.join(' ')}" data-cycle="${i}">${done ? '✓ ' : ''}${c.name}</div>`;
+  }).join('');
+  selectorEl.querySelectorAll('.cycle-pill').forEach(el => {
+    el.addEventListener('click', () => selectCycle(Number(el.dataset.cycle)));
+  });
+}
+
+/* =========================================================
+   RENDER — MATÉRIAS
+   ========================================================= */
+function renderSubjects() {
+  const subjects = currentSubjects();
+  listEl.innerHTML = subjects.map((s, i) => {
+    const isDone = completed[activeCycle][i];
+    return `
+      <div class="subject s${(i % 3) + 1} ${i === current ? 'active' : ''} ${isDone ? 'done' : ''}" data-index="${i}">
+        <div class="dot"></div>
+        <div class="info">
+          <div class="name">${s.name}</div>
+          <div class="time">${formatSubjectTime(s.time)}</div>
+        </div>
+        <div class="check" title="${isDone ? 'Concluída' : 'Marcar como concluída'}">✓</div>
+      </div>`;
+  }).join('');
+
+  listEl.querySelectorAll('.subject').forEach(el => {
+    el.addEventListener('click', () => {
+      const idx = Number(el.dataset.index);
+      if (idx === current) return;
+      if (running) stopTimer();
+      current = idx;
+      loadSubject(idx);
+      renderSubjects();
+      saveState();
+    });
+  });
+
+  listEl.querySelectorAll('.check').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = Number(el.closest('.subject').dataset.index);
+      if (completed[activeCycle][idx]) return;
+      completeSubject(idx);
+    });
+  });
+}
+
+/* =========================================================
+   CARREGAR MATÉRIA
+   ========================================================= */
+function loadSubject(idx, keepSeconds = false) {
+  const subj = currentSubjects()[idx];
+  const newIsCountdown = subj.time !== null && subj.time !== undefined;
+
+  if (keepSeconds && newIsCountdown === isCountdown) {
+    // mantém secondsLeft
+  } else {
+    secondsLeft = newIsCountdown ? subj.time * 60 : 0;
+  }
+
+  isCountdown = newIsCountdown;
+  labelEl.textContent = isCountdown
+    ? `Estudando: ${subj.name}`
+    : `⏱ ${subj.name} — tempo livre`;
+
+  updateTimerDisplay();
+  updateProgress();
+  updateCompleteBtn();
+}
+
+function updateTimerDisplay() {
+  timerEl.textContent = formatTime(secondsLeft);
+  timerEl.classList.toggle('warning', isCountdown && secondsLeft <= 60 && running);
+}
+
+/* =========================================================
+   HEADER / PROGRESSO / BOTÕES
+   ========================================================= */
+function updateProgress() {
+  const subs = completed[activeCycle];
+  const total = subs.length;
+  const done = subs.filter(Boolean).length;
+  progress.style.width = ((done / total) * 100) + '%';
+
+  const allDone = completed.every(c => c.every(Boolean));
+  footerInfo.textContent = allDone
+    ? `🎉 Todos os ${CONFIG.cycles.length} ciclos concluídos!`
+    : `${done} de ${total} matérias do Ciclo ${activeCycle + 1}`;
+}
+
+function updateHeader() {
+  cycleBadge.textContent = `Ciclo ${activeCycle + 1} / ${CONFIG.cycles.length}`;
+  if (!resetPending) {
+    resetBtn.textContent = `↻ Reiniciar Ciclo ${activeCycle + 1}`;
+  }
+}
+
+function updateCompleteBtn() {
+  const isDone = completed[activeCycle][current];
+  completeBtn.disabled = isDone;
+  completeBtn.textContent = isDone ? '✓ Matéria concluída' : '✓ Marcar como concluída';
+}
+
+/* =========================================================
+   TIMER
+   ========================================================= */
+function startTimer() {
+  if (running) return;
+  running = true;
+  tickCount = 0;
+  startBtn.textContent = '⏸ Pausar';
+  interval = setInterval(() => {
+    tickCount++;
+    if (isCountdown) {
+      secondsLeft--;
+      updateTimerDisplay();
+      if (secondsLeft <= 0) {
+        clearInterval(interval);
+        running = false;
+        startBtn.textContent = '▶ Iniciar';
+        timerEl.classList.remove('warning');
+        completeSubject(current);
+        return;
+      }
+    } else {
+      secondsLeft++;
+      updateTimerDisplay();
+    }
+    if (tickCount % 5 === 0) saveState();
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(interval);
+  running = false;
+  startBtn.textContent = '▶ Iniciar';
+  timerEl.classList.remove('warning');
+  saveState();
+}
+
+/* =========================================================
+   CONCLUIR MATÉRIA
+   ========================================================= */
+function completeSubject(idx) {
+  if (idx === undefined) idx = current;
+  if (completed[activeCycle][idx]) return;
+
+  const wasCurrent = (idx === current);
+  completed[activeCycle][idx] = true;
+
+  const nextIdx = completed[activeCycle].findIndex(v => !v);
+  const willChangeCycle = nextIdx === -1;
+
+  if (wasCurrent || willChangeCycle) stopTimer();
+
+  if (willChangeCycle) {
+    const nextCycle = completed.findIndex(c => !c.every(Boolean));
+    if (nextCycle !== -1) {
+      activeCycle = nextCycle;
+      const pending = completed[nextCycle].findIndex(v => !v);
+      current = pending !== -1 ? pending : 0;
+    }
+    updateHeader();
+    cancelAllPending();
+  } else {
+    current = nextIdx;
+  }
+
+  renderCycleSelector();
+  renderSubjects();
+
+  const keepTimer = !wasCurrent && !willChangeCycle;
+  loadSubject(current, keepTimer);
+
+  updateProgress();
+  saveState();
+}
+
+/* =========================================================
+   TROCAR CICLO / RESETS
+   ========================================================= */
+function selectCycle(idx) {
+  if (idx === activeCycle) return;
+  if (running) stopTimer();
+  cancelAllPending();
+
+  activeCycle = idx;
+  const pending = completed[idx].findIndex(v => !v);
+  current = pending !== -1 ? pending : 0;
+
+  updateHeader();
+  renderCycleSelector();
+  renderSubjects();
+  loadSubject(current);
+  updateProgress();
+  saveState();
+}
+
+function resetCycle() {
+  stopTimer();
+  cancelAllPending();
+  completed[activeCycle] = new Array(CONFIG.cycles[activeCycle].subjects.length).fill(false);
+  current = 0;
+  renderCycleSelector();
+  renderSubjects();
+  loadSubject(0);
+  updateProgress();
+  saveState();
+}
+
+function resetAll() {
+  stopTimer();
+  cancelAllPending();
+  try { localStorage.removeItem(STORAGE_KEY); } catch {}
+  completed = CONFIG.cycles.map(c => new Array(c.subjects.length).fill(false));
+  activeCycle = 0;
+  current = 0;
+  updateHeader();
+  renderCycleSelector();
+  renderSubjects();
+  loadSubject(0);
+  updateProgress();
+}
+
+/* =========================================================
+   EVENTOS — BOTÕES
+   ========================================================= */
+startBtn.addEventListener('click', () => {
+  running ? stopTimer() : startTimer();
+});
+
+resetBtn.addEventListener('click', () => {
+  if (resetPending) {
+    cancelResetPending();
+    resetCycle();
+    return;
+  }
+  cancelResetAllPending();
+  resetPending = true;
+  resetBtn.textContent = 'Confirmar reset?';
+  resetBtn.classList.add('confirming');
+  resetTimeout = setTimeout(cancelResetPending, 3000);
+});
+
+completeBtn.addEventListener('click', () => {
+  if (completed[activeCycle][current]) return;
+  completeSubject(current);
+});
+
+resetAllEl.addEventListener('click', () => {
+  if (resetAllPending) {
+    cancelResetAllPending();
+    resetAll();
+    return;
+  }
+  cancelResetPending();
+  resetAllPending = true;
+  resetAllEl.textContent = '⚠ Clique de novo para confirmar';
+  resetAllEl.classList.add('confirming');
+  resetAllTimeout = setTimeout(cancelResetAllPending, 3000);
+});
+
+/* =========================================================
+   INIT
+   ========================================================= */
+const restored = loadState();
+if (!restored) completed = CONFIG.cycles.map(c => new Array(c.subjects.length).fill(false));
+
+updateHeader();
+renderCycleSelector();
+renderSubjects();
+loadSubject(current, restored);
+updateProgress();
+</script>
+</body>
+</html>
